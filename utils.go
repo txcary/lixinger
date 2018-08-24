@@ -25,4 +25,3 @@ func httpPostJson(postBody []byte, url string) ([]byte, error) {
 func stringCount(str string) int {
 	return strings.Count(str, "") - 1
 }
-

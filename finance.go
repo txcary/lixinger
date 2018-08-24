@@ -53,7 +53,6 @@ func (obj *Lixinger) GetFinanceJsonData(id string) ([]byte, error) {
 	var err error
 	if _, ok := obj.financeMap[id]; !ok {
 		url, err := obj.getFinanceUrl(id)
-		fmt.Println(url)
 		postBody, err := obj.getFinancePostBody(id)
 		data, err := httpPostJson(postBody, url)
 		if err != nil {

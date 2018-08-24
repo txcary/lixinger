@@ -1,10 +1,35 @@
-# lixinger
-Stock data fetcher base on lixinger's open API https://www.lixinger.com/open/
+package lixinger
 
-Examples
-```golang
+import (
+	"fmt"
+	"github.com/go-ini/ini"
+	"os"
+	"runtime"
+)
+
+const (
+	configFile string = "lixinger.ini"
+)
+
+func slash() string {
+	var ostype = runtime.GOOS
+	if ostype == "windows" {
+		return "\\"
+	}
+	if ostype == "linux" {
+		return "/"
+	}
+	return "/"
+}
+
+func ExampleNew() {
 	id := "00700"
-	token := ""YOUR TOKEN from https://www.lixinger.com/open/api/token"
+	gopath := os.Getenv("GOPATH")
+	config, err := ini.Load(gopath + slash() + configFile)
+	if err != nil {
+		panic(err)
+	}
+	token := config.Section("").Key("token").String()
 	obj := New(token)
 
 	name, err := obj.GetMarketMetricsString(id, "latest", "stockCnName")
@@ -34,4 +59,4 @@ Examples
 	//腾讯控股
 	//31
 	//55
-```
+}
