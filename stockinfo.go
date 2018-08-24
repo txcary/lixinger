@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	simplejson "github.com/bitly/go-simplejson"
-	"strings"
 )
 
 const (
@@ -20,10 +19,6 @@ type StockInfo struct {
 	industryMap map[string]string
 }
 
-func (obj *Lixinger) stringCount(str string) int {
-	return strings.Count(str, "") - 1
-}
-
 func (obj *Lixinger) initIndustryMap() {
 	postBody := make(map[string]interface{})
 	postBody["token"] = obj.token
@@ -33,7 +28,7 @@ func (obj *Lixinger) initIndustryMap() {
 		for _, industryType := range industryTypeArray {
 			postBody["industryType"] = industryType
 			requestBytes, err := json.Marshal(postBody)
-			data, err := obj.httpPost(requestBytes, stockInfoUrl)
+			data, err := httpPostJson(requestBytes, stockInfoUrl)
 			if err == nil {
 				sjson, err := simplejson.NewJson(data)
 				if err != nil {
@@ -51,9 +46,9 @@ func (obj *Lixinger) initIndustryMap() {
 
 func (obj *Lixinger) getMarketType(id string) (string, error) {
 	marketType := ""
-	if obj.stringCount(id) == 5 {
+	if stringCount(id) == 5 {
 		marketType = "h"
-	} else if obj.stringCount(id) == 5 {
+	} else if stringCount(id) == 5 {
 		marketType = "a"
 	} else {
 		return marketType, errors.New("ID not correct!")
@@ -69,7 +64,7 @@ func (obj *Lixinger) getIndustryType(id string) (string, error) {
 	return industryType, nil
 }
 
-func (obj *Lixinger) InitStockInfo() {
+func (obj *Lixinger) initStockInfo() {
 	obj.industryMap = make(map[string]string)
 	obj.initIndustryMap()
 }

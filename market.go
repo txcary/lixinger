@@ -42,7 +42,7 @@ func (obj *Lixinger) GetMarketJsonData(id string) ([]byte, error) {
 		url, err := obj.getMarketUrl(id)
 		fmt.Println(url)
 		postBody, err := obj.getMarketPostBody(id)
-		data, err := obj.httpPost(postBody, url)
+		data, err := httpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -65,6 +65,6 @@ func (obj *Lixinger) GetMarketMetricsString(id string, dataMetrics string) (stri
 	metrics := sjson.Get(`data`).GetIndex(0).Get(dataMetrics).MustString()
 	return metrics, err
 }
-func (obj *Lixinger) InitMarket() {
+func (obj *Lixinger) initMarket() {
 	obj.marketMap = make(map[string][]byte)
 }

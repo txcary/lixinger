@@ -55,7 +55,7 @@ func (obj *Lixinger) GetFinanceJsonData(id string) ([]byte, error) {
 		url, err := obj.getFinanceUrl(id)
 		fmt.Println(url)
 		postBody, err := obj.getFinancePostBody(id)
-		data, err := obj.httpPost(postBody, url)
+		data, err := httpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -84,6 +84,6 @@ func (obj *Lixinger) GetFinanceMetricsFloat64(id string, date string, dataMetric
 	return -1, errors.New("Date not found!")
 }
 
-func (obj *Lixinger) InitFinance() {
+func (obj *Lixinger) initFinance() {
 	obj.financeMap = make(map[string][]byte)
 }
