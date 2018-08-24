@@ -39,20 +39,20 @@ func ExampleNew() {
 
 	roe, err := obj.GetFinanceMetricsFloat64(id, "2017-12-31", "q.metrics.roe.ttm")
 	if err == nil {
-		fmt.Println(int(roe*100))
+		fmt.Println(int(roe * 100))
 	}
 
 	/*
-	data, err := obj.GetMarketJsonData(id, "2017-12-29")
-	if err == nil {
-		fmt.Println(string(data))
-	}
+		data, err := obj.GetMarketJsonData(id, "2017-12-29")
+		if err == nil {
+			fmt.Println(string(data))
+		}
 	*/
 
 	//pe, err := obj.GetMarketMetricsFloat64(id, "latest", "pe_ttm")
 	pe, err := obj.GetMarketMetricsFloat64(id, "2017-12-29", "pe_ttm")
 	if err == nil {
-	  fmt.Println(int(pe))
+		fmt.Println(int(pe))
 	}
 
 	//output:

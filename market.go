@@ -16,7 +16,7 @@ var (
 
 type Market struct {
 	marketMap map[string][]byte
-	date string
+	date      string
 }
 
 func (obj *Lixinger) getMarketUrl(id string) (string, error) {
@@ -36,7 +36,7 @@ func (obj *Lixinger) getMarketPostBody(id string, date string) ([]byte, error) {
 
 func (obj *Lixinger) GetMarketJsonData(id string, date string) ([]byte, error) {
 	var err error
-	if _, ok := obj.marketMap[id]; !ok || date!=obj.date {
+	if _, ok := obj.marketMap[id]; !ok || date != obj.date {
 		url, err := obj.getMarketUrl(id)
 		postBody, err := obj.getMarketPostBody(id, date)
 		data, err := httpPostJson(postBody, url)
