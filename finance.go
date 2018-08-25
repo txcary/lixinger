@@ -49,7 +49,7 @@ func (obj *Lixinger) getFinanceUrl(id string) (string, error) {
 	return `https://open.lixinger.com/api/` + marketType + `/stock/fs/` + industryType, err
 }
 
-func (obj *Lixinger) GetFinanceJsonData(id string) ([]byte, error) {
+func (obj *Lixinger) getFinanceJsonData(id string) ([]byte, error) {
 	var err error
 	if _, ok := obj.financeMap[id]; !ok {
 		url, err := obj.getFinanceUrl(id)
@@ -64,8 +64,8 @@ func (obj *Lixinger) GetFinanceJsonData(id string) ([]byte, error) {
 	return obj.financeMap[id], err
 }
 
-func (obj *Lixinger) GetFinanceMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
-	data, err := obj.GetFinanceJsonData(id)
+func (obj *Lixinger) getFinanceMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
+	data, err := obj.getFinanceJsonData(id)
 	sjson, err := simplejson.NewJson(data)
 	dataArray := sjson.Get(`data`).MustArray()
 	metricsArray := strings.Split(dataMetrics, ".")
@@ -83,6 +83,13 @@ func (obj *Lixinger) GetFinanceMetricsFloat64(id string, date string, dataMetric
 	return -1, errors.New("Date not found!")
 }
 
+func (obj *Lixinger) getFinanceMetricsString(id string, date string, dataMetrics string) (string, error) {
+	return "", errors.New("Not Supported yet!")
+}
+
 func (obj *Lixinger) initFinance() {
 	obj.financeMap = make(map[string][]byte)
+	for _, metrics := range financeMetrics {
+		obj.strategyMap[metrics] = strategyFinance 	
+	}
 }

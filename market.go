@@ -12,6 +12,10 @@ var (
 		"dividend_r",
 		"stock_price",
 	}
+	marketImplicitMetrics = [...]string{
+		"stockCnName",
+	}
+
 )
 
 type Market struct {
@@ -34,7 +38,7 @@ func (obj *Lixinger) getMarketPostBody(id string, date string) ([]byte, error) {
 	return requestBytes, err
 }
 
-func (obj *Lixinger) GetMarketJsonData(id string, date string) ([]byte, error) {
+func (obj *Lixinger) getMarketJsonData(id string, date string) ([]byte, error) {
 	var err error
 	if _, ok := obj.marketMap[id]; !ok || date != obj.date {
 		url, err := obj.getMarketUrl(id)
@@ -50,19 +54,25 @@ func (obj *Lixinger) GetMarketJsonData(id string, date string) ([]byte, error) {
 
 }
 
-func (obj *Lixinger) GetMarketMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
-	data, err := obj.GetMarketJsonData(id, date)
+func (obj *Lixinger) getMarketMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
+	data, err := obj.getMarketJsonData(id, date)
 	sjson, err := simplejson.NewJson(data)
 	metrics := sjson.Get(`data`).GetIndex(0).Get(dataMetrics).MustFloat64()
 	return metrics, err
 }
 
-func (obj *Lixinger) GetMarketMetricsString(id string, date string, dataMetrics string) (string, error) {
-	data, err := obj.GetMarketJsonData(id, date)
+func (obj *Lixinger) getMarketMetricsString(id string, date string, dataMetrics string) (string, error) {
+	data, err := obj.getMarketJsonData(id, date)
 	sjson, err := simplejson.NewJson(data)
 	metrics := sjson.Get(`data`).GetIndex(0).Get(dataMetrics).MustString()
 	return metrics, err
 }
 func (obj *Lixinger) initMarket() {
 	obj.marketMap = make(map[string][]byte)
+	for _, metrics := range marketMetrics {
+		obj.strategyMap[metrics] = strategyMarket
+	}
+	for _, metrics := range marketImplicitMetrics {
+		obj.strategyMap[metrics] = strategyMarket
+	}
 }
