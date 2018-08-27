@@ -27,6 +27,17 @@ func (obj *Lixinger) Init(token string) {
 	obj.initStockInfo()
 }
 
+func (obj *Lixinger) FilterFloat64(id string, date string, dataMetrics string) (res []float64, err error) {
+	if strategy,ok := obj.strategyMap[dataMetrics]; ok {
+		if strategy == strategyFinance {
+			res, err = obj.filterFinanceMetricsFloat64(id, date, dataMetrics)
+			return
+		}
+	}
+	err = errors.New(dataMetrics+" not recognized!")
+	return
+}
+
 func (obj *Lixinger) GetFloat64(id string, date string, dataMetrics string) (res float64, err error) {
 	if strategy,ok := obj.strategyMap[dataMetrics]; ok {
 		if strategy == strategyFinance {

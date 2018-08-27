@@ -37,9 +37,17 @@ func ExampleNew() {
 		fmt.Println(name)
 	}
 
+	//roe, err := obj.GetFloat64(id, "latest", "q.metrics.roe.ttm")
 	roe, err := obj.GetFloat64(id, "2017-12-31", "q.metrics.roe.ttm")
 	if err == nil {
 		fmt.Println(int(roe * 100))
+	}
+
+	roeArray, err := obj.FilterFloat64(id, "12-31", "q.metrics.roe.ttm")
+	if err == nil {
+		for idx,_ := range roeArray {
+			fmt.Println(int(roeArray[idx] * 100))
+		}
 	}
 
 	//pe, err := obj.GetFloat64(id, "latest", "pe_ttm")
@@ -47,9 +55,19 @@ func ExampleNew() {
 	if err == nil {
 		fmt.Println(int(pe))
 	}
-
+	
 	//output:
 	//腾讯控股
 	//31
+	//31
+	//26
+	//28
+	//33
+	//30
+	//35
+	//40
+	//47
+	//53
+	//45
 	//55
 }

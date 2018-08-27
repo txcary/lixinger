@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	//"fmt"
 )
 
 const (
@@ -12,6 +13,8 @@ const (
 )
 
 func httpPostJson(postBody []byte, url string) ([]byte, error) {
+	//fmt.Println(string(postBody))
+	//fmt.Println(url)
 	var resp *http.Response
 	resp, err := http.Post(url, httpTypeJson, bytes.NewReader(postBody))
 	if err != nil {
@@ -19,6 +22,7 @@ func httpPostJson(postBody []byte, url string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
+	//fmt.Println(string(data))
 	return data, err
 }
 

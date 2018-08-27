@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	simplejson "github.com/bitly/go-simplejson"
-	"regexp"
+	//"regexp"
 	"strings"
 	"time"
 )
@@ -64,24 +64,78 @@ func (obj *Lixinger) getFinanceJsonData(id string) ([]byte, error) {
 	return obj.financeMap[id], err
 }
 
+func (obj *Lixinger) filterFinanceMetricsFloat64(id string, date string, dataMetrics string) ([]float64, error) {
+	data, err := obj.getFinanceJsonData(id)
+	sjson, err := simplejson.NewJson(data)
+	dataArray := sjson.Get(`data`).MustArray()
+	metricsArray := strings.Split(dataMetrics, ".")
+	res := make([]float64,0)
+
+	if date == "latest" {
+		item := sjson.Get(`data`).GetIndex(0)
+		for _, metrics := range metricsArray {
+			item = item.Get(metrics)
+		}
+		res = append(res, item.MustFloat64())
+		return res, err
+	} else {
+		for idx, _ := range dataArray {
+			item := sjson.Get(`data`).GetIndex(idx)
+			itemDate := item.Get(`date`).MustString()
+			//if isMatch, _ := regexp.MatchString("^"+date, itemDate); !isMatch {
+			if !strings.Contains(itemDate, date) {
+				continue
+			}
+			for _, metrics := range metricsArray {
+				item = item.Get(metrics)
+			}
+			res = append(res, item.MustFloat64())
+		}
+	}
+
+	return res, err
+}
+
+func (obj *Lixinger) getFinanceMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
+	dataArray, err := obj.filterFinanceMetricsFloat64(id, date, dataMetrics)
+	if len(dataArray) == 0 {
+		return -1, errors.New(date+":"+dataMetrics+" Not found!")
+	}
+	return dataArray[0], err
+}
+/*
 func (obj *Lixinger) getFinanceMetricsFloat64(id string, date string, dataMetrics string) (float64, error) {
 	data, err := obj.getFinanceJsonData(id)
 	sjson, err := simplejson.NewJson(data)
 	dataArray := sjson.Get(`data`).MustArray()
 	metricsArray := strings.Split(dataMetrics, ".")
-	for idx, _ := range dataArray {
-		item := sjson.Get(`data`).GetIndex(idx)
-		itemDate := item.Get(`date`).MustString()
-		if isMatch, _ := regexp.MatchString("^"+date, itemDate); !isMatch {
-			continue
+
+	item := sjson.Get(`data`)	
+	ok := false
+	if date == "latest" {
+		item = item.GetIndex(0)
+		ok = true
+	} else {
+		for idx, _ := range dataArray {
+			itemDate := item.GetIndex(idx).Get(`date`).MustString()
+			if isMatch, _ := regexp.MatchString("^"+date, itemDate); !isMatch {
+				continue
+			}
+			item = item.GetIndex(idx)
+			ok = true
+			break
 		}
+	}
+	if ok {
 		for _, metrics := range metricsArray {
 			item = item.Get(metrics)
 		}
 		return item.MustFloat64(), err
 	}
+
 	return -1, errors.New("Date not found!")
 }
+*/
 
 func (obj *Lixinger) getFinanceMetricsString(id string, date string, dataMetrics string) (string, error) {
 	return "", errors.New("Not Supported yet!")
