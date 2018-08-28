@@ -2,6 +2,7 @@ package lixinger
 
 import (
 	"errors"
+	"sync"
 )
 
 const (
@@ -15,12 +16,11 @@ type Lixinger struct {
 	StockInfo
 
 	token string
-	strategyMap map[string]int
+	strategyMap sync.Map
 }
 
 func (obj *Lixinger) Init(token string) {
 	obj.token = token
-	obj.strategyMap = make(map[string]int)
 
 	obj.initFinance()
 	obj.initMarket()
@@ -28,7 +28,8 @@ func (obj *Lixinger) Init(token string) {
 }
 
 func (obj *Lixinger) FilterFloat64(id string, date string, dataMetrics string) (res []float64, err error) {
-	if strategy,ok := obj.strategyMap[dataMetrics]; ok {
+	if v,ok := obj.strategyMap.Load(dataMetrics); ok {
+		strategy := v.(int)
 		if strategy == strategyFinance {
 			res, err = obj.filterFinanceMetricsFloat64(id, date, dataMetrics)
 			return
@@ -39,7 +40,8 @@ func (obj *Lixinger) FilterFloat64(id string, date string, dataMetrics string) (
 }
 
 func (obj *Lixinger) GetFloat64(id string, date string, dataMetrics string) (res float64, err error) {
-	if strategy,ok := obj.strategyMap[dataMetrics]; ok {
+	if v,ok := obj.strategyMap.Load(dataMetrics); ok {
+		strategy := v.(int)
 		if strategy == strategyFinance {
 			res, err = obj.getFinanceMetricsFloat64(id, date, dataMetrics)
 			return
@@ -54,7 +56,8 @@ func (obj *Lixinger) GetFloat64(id string, date string, dataMetrics string) (res
 }
 
 func (obj *Lixinger) GetString(id string, date string, dataMetrics string) (res string, err error) {
-	if strategy,ok := obj.strategyMap[dataMetrics]; ok {
+	if v,ok := obj.strategyMap.Load(dataMetrics); ok {
+		strategy := v.(int)
 		if strategy == strategyFinance {
 			res, err = obj.getFinanceMetricsString(id, date, dataMetrics)
 			return

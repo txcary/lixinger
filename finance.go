@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	simplejson "github.com/bitly/go-simplejson"
-	//"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -26,7 +26,7 @@ var (
 )
 
 type Finance struct {
-	financeMap map[string][]byte
+	financeMap sync.Map
 }
 
 func (obj *Lixinger) getFinancePostBody(id string) ([]byte, error) {
@@ -51,17 +51,19 @@ func (obj *Lixinger) getFinanceUrl(id string) (string, error) {
 
 func (obj *Lixinger) getFinanceJsonData(id string) ([]byte, error) {
 	var err error
-	if _, ok := obj.financeMap[id]; !ok {
+	var v interface{}
+	var ok bool
+	if v, ok = obj.financeMap.Load(id); !ok {
 		url, err := obj.getFinanceUrl(id)
 		postBody, err := obj.getFinancePostBody(id)
 		data, err := httpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}
-		obj.financeMap[id] = data
+		v,_ = obj.financeMap.LoadOrStore(id, data)
 	}
 
-	return obj.financeMap[id], err
+	return v.([]byte), err
 }
 
 func (obj *Lixinger) filterFinanceMetricsFloat64(id string, date string, dataMetrics string) ([]float64, error) {
@@ -109,8 +111,7 @@ func (obj *Lixinger) getFinanceMetricsString(id string, date string, dataMetrics
 }
 
 func (obj *Lixinger) initFinance() {
-	obj.financeMap = make(map[string][]byte)
 	for _, metrics := range financeMetrics {
-		obj.strategyMap[metrics] = strategyFinance 	
+		obj.strategyMap.Store(metrics, strategyFinance)
 	}
 }

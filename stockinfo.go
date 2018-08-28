@@ -3,6 +3,7 @@ package lixinger
 import (
 	"encoding/json"
 	"errors"
+	"sync"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -16,7 +17,7 @@ var (
 )
 
 type StockInfo struct {
-	industryMap map[string]string
+	industryMap sync.Map
 }
 
 func (obj *Lixinger) initIndustryMap() {
@@ -37,7 +38,7 @@ func (obj *Lixinger) initIndustryMap() {
 				dataArray := sjson.Get(`data`).MustArray()
 				for idx, _ := range dataArray {
 					id := sjson.Get(`data`).GetIndex(idx).Get(`stockCode`).MustString()
-					obj.industryMap[id] = industryType
+					obj.industryMap.Store(id, industryType)
 				}
 			}
 		}
@@ -58,13 +59,12 @@ func (obj *Lixinger) getMarketType(id string) (string, error) {
 
 func (obj *Lixinger) getIndustryType(id string) (string, error) {
 	industryType := "industry"
-	if newType, ok := obj.industryMap[id]; ok {
-		industryType = newType
+	if newType, ok := obj.industryMap.Load(id); ok {
+		industryType = newType.(string)
 	}
 	return industryType, nil
 }
 
 func (obj *Lixinger) initStockInfo() {
-	obj.industryMap = make(map[string]string)
 	obj.initIndustryMap()
 }

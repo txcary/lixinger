@@ -2,6 +2,7 @@ package lixinger
 
 import (
 	"encoding/json"
+	"sync"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -19,7 +20,7 @@ var (
 )
 
 type Market struct {
-	marketMap map[string][]byte
+	marketMap sync.Map
 	date      string
 }
 
@@ -40,17 +41,20 @@ func (obj *Lixinger) getMarketPostBody(id string, date string) ([]byte, error) {
 
 func (obj *Lixinger) getMarketJsonData(id string, date string) ([]byte, error) {
 	var err error
-	if _, ok := obj.marketMap[id]; !ok || date != obj.date {
+	var v interface{}
+	var ok bool
+	if v, ok = obj.marketMap.Load(id); !ok || date != obj.date {
 		url, err := obj.getMarketUrl(id)
 		postBody, err := obj.getMarketPostBody(id, date)
 		data, err := httpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}
-		obj.marketMap[id] = data
+		obj.marketMap.Store(id, data)
+		v,_ = obj.marketMap.Load(id)
 		obj.date = date
 	}
-	return obj.marketMap[id], err
+	return v.([]byte), err
 
 }
 
@@ -68,11 +72,10 @@ func (obj *Lixinger) getMarketMetricsString(id string, date string, dataMetrics 
 	return metrics, err
 }
 func (obj *Lixinger) initMarket() {
-	obj.marketMap = make(map[string][]byte)
 	for _, metrics := range marketMetrics {
-		obj.strategyMap[metrics] = strategyMarket
+		obj.strategyMap.Store(metrics, strategyMarket)
 	}
 	for _, metrics := range marketImplicitMetrics {
-		obj.strategyMap[metrics] = strategyMarket
+		obj.strategyMap.Store(metrics, strategyMarket)
 	}
 }
