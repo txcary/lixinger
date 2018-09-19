@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"sync"
+	"fmt"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -49,10 +50,12 @@ func (obj *Lixinger) getMarketType(id string) (string, error) {
 	marketType := ""
 	if stringCount(id) == 5 {
 		marketType = "h"
-	} else if stringCount(id) == 5 {
+	} else if stringCount(id) == 6 {
 		marketType = "a"
 	} else {
-		return marketType, errors.New("ID not correct!")
+		errmsg := "Error: ID not correct!"
+		fmt.Println(errmsg)
+		return marketType, errors.New(errmsg)
 	}
 	return marketType, nil
 }
