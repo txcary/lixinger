@@ -3,6 +3,7 @@ package lixinger
 import (
 	"encoding/json"
 	"sync"
+	"github.com/txcary/goutils"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -26,7 +27,7 @@ type Market struct {
 
 func (obj *Lixinger) getMarketUrl(id string) (string, error) {
 	marketType, err := obj.getMarketType(id)
-	return `https://open.lixinger.com/api/` + marketType + `/stock/fundamental`, err
+	return `https://open.lixinger.com/api/stock/fundamental/` + marketType, err
 }
 
 func (obj *Lixinger) getMarketPostBody(id string, date string) ([]byte, error) {
@@ -46,7 +47,7 @@ func (obj *Lixinger) getMarketJsonData(id string, date string) ([]byte, error) {
 	if v, ok = obj.marketMap.Load(id); !ok || date != obj.date {
 		url, err := obj.getMarketUrl(id)
 		postBody, err := obj.getMarketPostBody(id, date)
-		data, err := httpPostJson(postBody, url)
+		data, err := utils.HttpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}

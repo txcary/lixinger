@@ -5,6 +5,7 @@ import (
 	"errors"
 	"sync"
 	"fmt"
+	"github.com/txcary/goutils"
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -30,7 +31,7 @@ func (obj *Lixinger) initIndustryMap() {
 		for _, industryType := range industryTypeArray {
 			postBody["industryType"] = industryType
 			requestBytes, err := json.Marshal(postBody)
-			data, err := httpPostJson(requestBytes, stockInfoUrl)
+			data, err := utils.HttpPostJson(requestBytes, stockInfoUrl)
 			if err == nil {
 				sjson, err := simplejson.NewJson(data)
 				if err != nil {
@@ -48,9 +49,9 @@ func (obj *Lixinger) initIndustryMap() {
 
 func (obj *Lixinger) getMarketType(id string) (string, error) {
 	marketType := ""
-	if stringCount(id) == 5 {
+	if utils.StringCount(id) == 5 {
 		marketType = "h"
-	} else if stringCount(id) == 6 {
+	} else if utils.StringCount(id) == 6 {
 		marketType = "a"
 	} else {
 		errmsg := "Error: ID not correct!"

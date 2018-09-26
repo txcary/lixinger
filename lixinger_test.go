@@ -3,6 +3,7 @@ package lixinger
 import (
 	"fmt"
 	"github.com/go-ini/ini"
+	"github.com/txcary/goutils"
 	"os"
 	"runtime"
 )
@@ -23,6 +24,7 @@ func slash() string {
 }
 
 func ExampleNew() {
+	utils.SetLogLevel(utils.LogLevelDebug)	
 	id := "00700"
 	gopath := os.Getenv("GOPATH")
 	config, err := ini.Load(gopath + slash() + configFile)

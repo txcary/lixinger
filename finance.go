@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/txcary/goutils"
 	simplejson "github.com/bitly/go-simplejson"
 	"strings"
 	"sync"
@@ -46,7 +47,7 @@ func (obj *Lixinger) getFinancePostBody(id string) ([]byte, error) {
 func (obj *Lixinger) getFinanceUrl(id string) (string, error) {
 	marketType, err := obj.getMarketType(id)
 	industryType, err := obj.getIndustryType(id)
-	return `https://open.lixinger.com/api/` + marketType + `/stock/fs/` + industryType, err
+	return `https://open.lixinger.com/api/stock/fs/` + marketType + `/` + industryType, err
 }
 
 func (obj *Lixinger) getFinanceJsonData(id string) ([]byte, error) {
@@ -56,7 +57,7 @@ func (obj *Lixinger) getFinanceJsonData(id string) ([]byte, error) {
 	if v, ok = obj.financeMap.Load(id); !ok {
 		url, err := obj.getFinanceUrl(id)
 		postBody, err := obj.getFinancePostBody(id)
-		data, err := httpPostJson(postBody, url)
+		data, err := utils.HttpPostJson(postBody, url)
 		if err != nil {
 			return []byte{}, err
 		}
